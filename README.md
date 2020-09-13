@@ -2,16 +2,15 @@
 
 This collection of files provides a reproducer for the `patchelf` issue
 noted above. To reproduce the bug invoke `nix-build` from within this
-repository and invoke `result/bin/issue_146` followed by
-`result/bin/issue_146.unpatched`:
+repository and invoke each of the files found in `result/bin`.
 
 ```
 $ nix-build
 these derivations will be built:
-  /nix/store/s0ap6gww54ry8lx8sx8mcc71flhdw5d6-issue_146.drv
-building '/nix/store/s0ap6gww54ry8lx8sx8mcc71flhdw5d6-issue_146.drv'...
+  /nix/store/9k532l30k68f2szb02f9dxyq1hnn43vj-issue_146.drv
+building '/nix/store/9k532l30k68f2szb02f9dxyq1hnn43vj-issue_146.drv'...
 unpacking sources
-unpacking source archive /nix/store/af9dbhwxlxjqby6f2i2kb2hrndzy9wgv-NixOS-patchelf-issue-146
+unpacking source archive /nix/store/z6hy06xnn2a5pciyzr7aqmpzas8hwdxz-NixOS-patchelf-issue-146
 source root is NixOS-patchelf-issue-146
 patching sources
 configuring
@@ -31,26 +30,22 @@ net/http
 issue_146
 installing
 post-installation fixup
-shrinking RPATHs of ELF executables and libraries in /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146
-shrinking /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146/bin/issue_146
+shrinking RPATHs of ELF executables and libraries in /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146
+shrinking /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146/bin/issue_146
 strip is /nix/store/h4v5qdxlmnh7xfpl7pwzrs8js7220bz2-binutils-2.31.1/bin/strip
-stripping (with command strip and flags -S) in /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146/bin
-patching script interpreter paths in /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146
-checking for references to /build/ in /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146...
+stripping (with command strip and flags -S) in /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146/bin
+patching script interpreter paths in /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146
+checking for references to /build/ in /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146...
 automatically fixing dependencies for ELF files
-searching for dependencies of /nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146/bin/issue_146
+searching for dependencies of /nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146/bin/issue_146.patchelf
   libgssapi_krb5.so.2 -> found: /nix/store/r0v2kz5a9f888lqkslh9zhz67rh2hifq-libkrb5-1.18/lib/libgssapi_krb5.so.2
 setting RPATH to: /nix/store/r0v2kz5a9f888lqkslh9zhz67rh2hifq-libkrb5-1.18/lib
-/nix/store/rg77fl092bdwi893lrq3ybh9z5vh9l8b-issue_146
+/nix/store/4fhk4mynwlddiviwxv423kd7m2fn2xm3-issue_146
 
-$ result/bin/issue_146
-Segmentation fault (core dumped)
-
-$ result/bin/issue_146.unpatched
-result/bin/issue_146.unpatched: error while loading shared libraries: libgssapi_krb5.so.2: cannot open shared object file: No such file or directory
-
-$ LD_LIBRARY_PATH=/nix/store/r0v2kz5a9f888lqkslh9zhz67rh2hifq-libkrb5-1.18/lib result/bin/issue_146.unpatched && echo works
-works
+$ for i in result/bin/*; do echo -n $i "... " && $i && echo WORKS; done
+result/bin/issue_146 ... result/bin/issue_146: error while loading shared libraries: libgssapi_krb5.so.2: cannot open shared object file: No such file or directory
+result/bin/issue_146.patchelf ... Segmentation fault (core dumped)
+result/bin/issue_146.wrapped ... WORKS
 
 $
 ```
